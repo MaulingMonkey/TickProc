@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TickProc", "TickProc\TickProc.csproj", "{5905FC3E-C5EE-4C45-98B3-0061F20BAAD2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{5051B65F-7959-4F84-A8C2-7657454DF1C3}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.txt = LICENSE.txt
+		Readme.md = Readme.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configuration", "{AD4209D2-E410-45BF-907F-3D5E5DDD6CD2}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5905FC3E-C5EE-4C45-98B3-0061F20BAAD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5905FC3E-C5EE-4C45-98B3-0061F20BAAD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5905FC3E-C5EE-4C45-98B3-0061F20BAAD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5905FC3E-C5EE-4C45-98B3-0061F20BAAD2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

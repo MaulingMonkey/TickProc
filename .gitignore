@@ -1,0 +1,8 @@
+Thumbs.db
+
+*.user
+
+.vs/
+TestResults/
+bin/
+obj/

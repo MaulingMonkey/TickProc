@@ -25,7 +25,7 @@ run notepad
 run notepad
 ```
 
-* TickProc will launch 3 processes when started with the above config.
+* TickProc will launch 7 processes when started with the above config.
   * Console programs will have their window hidden and output redirected.
   * Redirected output may be collected for logging / error reporting.
 

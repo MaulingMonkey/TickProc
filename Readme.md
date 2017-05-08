@@ -2,6 +2,12 @@
 
 Simple service process runner / monitor.
 
+**NOTE WELL:** This project is not yet considered "stable".  I will break backwards compatability:
+* Config paths
+* Config syntax
+
+Features are unlikely to be removed however.
+
 License: [Apache 2.0](LICENSE.txt)
 
 # Example Config

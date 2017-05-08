@@ -63,6 +63,7 @@
     <Compile Include="Paths.cs" />
     <Compile Include="Program\CreateNotifyIcon.cs" />
     <Compile Include="Program\MonitorThreadProc.cs" />
+    <Compile Include="Program\NotifyIconShowException.cs" />
     <Compile Include="Program\Shutdown.cs" />
     <Compile Include="Program\_Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -103,6 +104,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\NotifyIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NotifyIconError.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

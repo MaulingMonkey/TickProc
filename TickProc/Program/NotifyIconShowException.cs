@@ -13,31 +13,32 @@
    limitations under the License.
 */
 
-using System.Diagnostics;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using TickProc.Properties;
 
 namespace TickProc {
 	partial class Program {
-		static void EditConfigFile() { Process.Start("\""+Paths.ConfigFile+"\""); }
+		static void NotifyIconShowException(Form form, NotifyIcon ni, Exception ex) {
+			lock (Mutex) if (!_Shutdown) {
+				Action a = () => {
+					if (CheckShutdown()) return;
 
-		static NotifyIcon CreateNotifyIcon() {
-			var ni = new NotifyIcon() {
-				Icon = Icon.FromHandle(Resources.NotifyIcon.GetHicon()),
-				Text = "TickProc",
-				ContextMenu = new ContextMenu() {
-					MenuItems = {
-						// TODO: sentry.io link
-						{ "Edit Config File", delegate { EditConfigFile(); } },
-						"-",
-						{ "E&xit", delegate { Application.Exit(); } }
-					}
-				}
-			};
-			ni.DoubleClick += delegate { EditConfigFile(); };
-			ni.Visible = true;
-			return ni;
+					var newIconImg = ex == null ? Resources.NotifyIcon : Resources.NotifyIconError;
+					var newIcon = Icon.FromHandle(newIconImg.GetHicon());
+					var oldIcon = ni.Icon;
+
+					ni.Icon = newIcon;
+
+					using (oldIcon) { }
+					using (newIconImg) { }
+
+					if (ex == null) { if (ni.Visible) { ni.Visible = false; ni.Visible = true; } }
+					else            ni.ShowBalloonTip(10000, ex.GetType().Name, ex.Message, ToolTipIcon.Error);
+				};
+				form.BeginInvoke(a);
+			}
 		}
 	}
 }

@@ -24,13 +24,23 @@ namespace TickProc {
 		[STAThread] static void Main() {
 			Paths.CreateDefaultStructure();
 			SystemEvents.SessionEnding += delegate { Close(); };
-			MonitorThread = new Thread(MonitorThreadProc) { Name = "MonitorThreadProc" };
-			MonitorThread.Start();
 
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			using (CreateNotifyIcon()) Application.Run();
-			lock (Mutex) _Shutdown = true; // Just in case
+
+			using (var form = new Form())
+			using (var ni = CreateNotifyIcon())
+			{
+				form.Show();
+				form.Hide();
+
+				Action<Exception> doReport = ex => NotifyIconShowException(form, ni, ex);
+				MonitorThread = new Thread(MonitorThreadProc) { Name = "MonitorThreadProc" };
+				MonitorThread.Start(doReport);
+				Application.Run();
+
+				lock (Mutex) _Shutdown = true; // Just in case
+			}
 		}
 	}
 }

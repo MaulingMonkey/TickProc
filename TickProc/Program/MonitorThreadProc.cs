@@ -25,12 +25,15 @@ namespace TickProc {
 		static ConfigFile CurrentConfig;
 		static readonly Dictionary<ConfigFile.RunEntry, MonitoredProcess> MonitoredProcesses = new Dictionary<ConfigFile.RunEntry, MonitoredProcess>();
 		static void MonitorThreadProc(object o) {
+			var displayException = (Action<Exception>)o;
 			try {
 				while (!CheckShutdown()) {
 					for (int maxRetries = 10; maxRetries --> 0; ) {
 						if (CheckShutdown()) return;
-						try { CurrentConfig = ConfigFile.Load(Paths.ConfigFile); }
+						try { CurrentConfig = ConfigFile.Load(Paths.ConfigFile); ReportMonitorException(null, displayException); }
 						catch (IOException) when (maxRetries > 0) { Thread.Sleep(100); continue; }
+						catch (IOException              e) { ReportMonitorException(e, displayException); }
+						catch (ConfigFileParseException e) { ReportMonitorException(e, displayException); }
 					}
 
 					if (CurrentConfig != null) {
@@ -55,9 +58,25 @@ namespace TickProc {
 
 					Thread.Sleep(TimeSpan.FromSeconds(5));
 				}
-			} finally {
-				foreach (var kv in MonitoredProcesses) kv.Value.Dispose();
 			}
+			catch (Exception e) when (!Debugger.IsAttached) { ReportMonitorException(e, displayException); }
+			finally { foreach (var kv in MonitoredProcesses) kv.Value.Dispose(); }
+		}
+
+		static Exception LastMonitorException;
+		static void ReportMonitorException(Exception e, Action<Exception> displayEx) {
+			if (LastMonitorException == e) return; // Unspam (including LME == e == null)
+
+			var sameException // Unspam "equivalent" exceptions
+				=  (LastMonitorException != null)
+				&& (e                    != null)
+				&& (LastMonitorException.GetType() == e.GetType())
+				&& (LastMonitorException.Message   == e.Message  );
+
+			LastMonitorException = e;
+			if (sameException) return;
+
+			displayEx(e);
 		}
 
 		static Process CreateProcFor(ConfigFile.RunEntry e) {

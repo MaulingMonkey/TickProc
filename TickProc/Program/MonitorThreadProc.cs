@@ -57,14 +57,6 @@ namespace TickProc {
 
 			try {
 				while (!CheckShutdown()) {
-					//for (int maxRetries = 10; maxRetries --> 0; ) {
-					//	if (CheckShutdown()) return;
-					//	try { CurrentConfig = ConfigFile.Load(Paths.ConfigFile); ReportMonitorException(null, displayException); }
-					//	catch (IOException) when (maxRetries > 0) { Thread.Sleep(100); continue; }
-					//	catch (IOException              e) { ReportMonitorException(e, displayException); }
-					//	catch (ConfigFileParseException e) { ReportMonitorException(e, displayException); }
-					//}
-
 					lock (Mutex) if (ReparsedConfig && (CurrentConfig != null)) {
 						ReparsedConfig = false;
 

@@ -31,7 +31,7 @@ namespace TickProc {
 						// TODO: sentry.io link
 						{ "Edit Config File", delegate { EditConfigFile(); } },
 						"-",
-						{ "E&xit", delegate { Application.Exit(); } }
+						{ "E&xit", delegate { Close(); } }
 					}
 				}
 			};

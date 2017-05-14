@@ -13,6 +13,7 @@
    limitations under the License.
 */
 
+using System.Threading;
 using System.Windows.Forms;
 
 namespace TickProc {
@@ -21,7 +22,10 @@ namespace TickProc {
 		static bool _Shutdown = false;
 
 		static void Close() {
-			lock (Mutex) _Shutdown = true;
+			lock (Mutex) {
+				_Shutdown = true;
+				Monitor.PulseAll(Mutex);
+			}
 			Application.Exit();
 		}
 

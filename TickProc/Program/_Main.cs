@@ -39,7 +39,10 @@ namespace TickProc {
 				MonitorThread.Start(doReport);
 				Application.Run();
 
-				lock (Mutex) _Shutdown = true; // Just in case
+				lock (Mutex) {
+					_Shutdown = true; // Just in case
+					Monitor.PulseAll(Mutex);
+				}
 			}
 		}
 	}

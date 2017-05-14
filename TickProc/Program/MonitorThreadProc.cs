@@ -13,6 +13,7 @@
    limitations under the License.
 */
 
+using MaulingMonkey;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,19 +25,49 @@ namespace TickProc {
 	static partial class Program {
 		static ConfigFile CurrentConfig;
 		static readonly Dictionary<ConfigFile.RunEntry, MonitoredProcess> MonitoredProcesses = new Dictionary<ConfigFile.RunEntry, MonitoredProcess>();
+
+		static void OnAsyncConfigUpdate(string[] lines, Action<Exception> displayException) {
+			lock (Mutex) {
+				try { CurrentConfig = ConfigFile.Parse(Paths.ConfigFile, lines); ReportMonitorException(null, displayException); }
+				catch (ConfigFileParseException e) { ReportMonitorException(e, displayException); }
+				ReparsedConfig = true;
+				Monitor.PulseAll(Mutex);
+			}
+		}
+
+		static void OnAsyncConfigError(Exception e, Action<Exception> displayException) {
+			lock (Mutex) {
+				//CurrentConfig = null;
+				ReportMonitorException(null, displayException);
+				Monitor.PulseAll(Mutex);
+			}
+		}
+
+		static bool ReparsedConfig = true;
 		static void MonitorThreadProc(object o) {
 			var displayException = (Action<Exception>)o;
+
+			try {
+				Watch.FileLines(Paths.ConfigFile,
+					lines => OnAsyncConfigUpdate(lines.ToArray(), displayException),
+					error => OnAsyncConfigError (error,           displayException));
+			}
+			// XXX: These are a little more severe than transitory exceptions.  Kill the process?
+			catch (IOException e) { ReportMonitorException(e, displayException); }
+
 			try {
 				while (!CheckShutdown()) {
-					for (int maxRetries = 10; maxRetries --> 0; ) {
-						if (CheckShutdown()) return;
-						try { CurrentConfig = ConfigFile.Load(Paths.ConfigFile); ReportMonitorException(null, displayException); }
-						catch (IOException) when (maxRetries > 0) { Thread.Sleep(100); continue; }
-						catch (IOException              e) { ReportMonitorException(e, displayException); }
-						catch (ConfigFileParseException e) { ReportMonitorException(e, displayException); }
-					}
+					//for (int maxRetries = 10; maxRetries --> 0; ) {
+					//	if (CheckShutdown()) return;
+					//	try { CurrentConfig = ConfigFile.Load(Paths.ConfigFile); ReportMonitorException(null, displayException); }
+					//	catch (IOException) when (maxRetries > 0) { Thread.Sleep(100); continue; }
+					//	catch (IOException              e) { ReportMonitorException(e, displayException); }
+					//	catch (ConfigFileParseException e) { ReportMonitorException(e, displayException); }
+					//}
 
-					if (CurrentConfig != null) {
+					lock (Mutex) if (ReparsedConfig && (CurrentConfig != null)) {
+						ReparsedConfig = false;
+
 						var newSet = new HashSet<ConfigFile.RunEntry>();
 						foreach (var e in CurrentConfig.RunList) newSet.Add(e);
 
@@ -56,7 +87,7 @@ namespace TickProc {
 						}
 					}
 
-					Thread.Sleep(TimeSpan.FromSeconds(5));
+					lock (Mutex) if (!ReparsedConfig) Monitor.Wait(Mutex, 30000); else ReparsedConfig = false;
 				}
 			}
 			catch (Exception e) when (!Debugger.IsAttached) { ReportMonitorException(e, displayException); }

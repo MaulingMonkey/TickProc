@@ -51,12 +51,13 @@ namespace TickProc {
 				throw new ConfigFileParseException(ConfigFile, ParsingPath, ParsingLineNo, "Unrecognized action '"+action+"'");
 			}
 
-			public void Parse(string path) {
+			public void Parse(string path) { Parse(path, null); }
+			public void Parse(string path, string[] linesOverride) {
 				try {
 					ParsingPath = path;
 					ParsingLineNo = 0;
 
-					var lines = File.ReadLines(path);
+					var lines = linesOverride ?? File.ReadLines(path);
 					foreach (var line in lines) {
 						++ParsingLineNo;
 						if (string.IsNullOrWhiteSpace(line)) continue;

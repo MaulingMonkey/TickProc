@@ -26,5 +26,12 @@ namespace TickProc {
 			parser.Parse(path);
 			return config;
 		}
+
+		public static ConfigFile Parse(string path, string[] lines) {
+			var config = new ConfigFile();
+			var parser = new Parser(config);
+			parser.Parse(path, lines);
+			return config;
+		}
 	}
 }
